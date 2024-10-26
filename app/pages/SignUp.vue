@@ -73,7 +73,7 @@
 import { ref } from 'vue';
 import type { FormError } from '#ui/types';
 import type { UserSignUp } from '~~/types/types';
-import { createClient } from '@supabase/supabase-js';
+import { AuthError, createClient } from '@supabase/supabase-js';
 import GoogleIcon from '../../assets/icons/Google.vue';
 
 const supabase = createClient("https://jjewrcjhtqwapmssonfo.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZXdyY2podHF3YXBtc3NvbmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjIwNDUsImV4cCI6MjA0MzYzODA0NX0.zqk2RUxq6L74-n4b137mOm4LM85K-d8Z9_XzUFbW7i0");
@@ -83,18 +83,24 @@ const email = ref<string>('');
 const password = ref<string>('');
 
 const signUp = async(user: UserSignUp) => {
-  const errors: FormError[] = []
+  const errors: FormError[] = [];
   if (!user.email) errors.push({ path: 'email', message: 'Email is required' })
   if (!user.password) errors.push({ path: 'password', message: 'Password is required' })
-  if (errors) {
+  if (errors.length != 0) {
     return errors
   }
   
   const { data, error } = await supabase.auth.signUp({
     email: user.email,
     password: user.password,
+    options: {
+      data: {
+        username: user.username,
+      },
+    },
   });
 
+  console.log(data);
   console.log(error);
 
   username.value='';
