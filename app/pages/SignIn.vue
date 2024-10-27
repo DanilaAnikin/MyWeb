@@ -1,49 +1,3 @@
-<!-- <script setup lang="ts">
-import type { FormError } from '#ui/types'
-import { createClient } from '@supabase/supabase-js';
-import type { UserLogin } from '~~/types/types';
-
-const supabase = createClient('https://jjewrcjhtqwapmssonfo.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZXdyY2podHF3YXBtc3NvbmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjIwNDUsImV4cCI6MjA0MzYzODA0NX0.zqk2RUxq6L74-n4b137mOm4LM85K-d8Z9_XzUFbW7i0');
-
-const fields = [{
-  name: 'email',
-  type: 'text',
-  label: 'Email',
-  placeholder: 'Enter your email'
-}, {
-  name: 'password',
-  label: 'Password',
-  type: 'password',
-  placeholder: 'Enter your password'
-}, {
-  name: 'remember',
-  label: 'Remember me',
-  type: 'checkbox'
-}]
-
-const validate = (state: any) => {
-  const errors: FormError[] = []
-  if (!state.email) errors.push({ path: 'email', message: 'Email is required' })
-  if (!state.password) errors.push({ path: 'password', message: 'Password is required' })
-  return errors
-}
-
-const providers = [{
-  label: 'Continue with GitHub',
-  icon: 'i-simple-icons-github',
-  color: 'white' as const,
-  click: () => {
-    console.log('Redirect to GitHub')
-  }
-}]
-
-const onSubmit = async(user: UserLogin) => {
-  const { data, error } = await supabase.auth.signInWithPassword(user);
-  console.log(error);
-}
-</script>
--->
-
 <template>
   <div class="flex justify-center items-center mt-[10%]">
     <div class="w-full max-w-md rounded-lg shadow-md p-8 border-slate-500 border">
@@ -87,11 +41,13 @@ const onSubmit = async(user: UserLogin) => {
         </div>
       </form>
 
-      <div class="text-center text-gray-500 mb-6">or</div>
+      <p class="w-full text-center">Don't have an account yet? <NuxtLink to="/signUp" class="text-green-600 text-lg"> Sign up</NuxtLink></p>
+
+      <div class="text-center text-gray-500 my-6">or</div>
 
       <div>
         <NuxtLink
-          to="/"
+          @click="loginWithGoogle()"
           class="w-full gap-4 border border-slate-400 transition-all duration-500 font-bold text-white py-4 px-4 rounded-md flex items-center justify-center hover:bg-indigo-700 hover:text-slate-200"
         >
           <GoogleIcon color="#9189f5" />
@@ -126,18 +82,18 @@ const login = async(user: UserLogin) => {
 
   const { data, error } = await supabase.auth.signInWithPassword(user);
 
-  console.log(error);
-  console.log(data)
-
-  email.value='';
-  password.value='';
+  if(!error) {
+    window.location.pathname = '/';
+  }
 }
 
-const loginWithGoogle = async(user: UserLogin) => {
+const loginWithGoogle = async() => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
+    options: {
+      redirectTo: '/',
+    },
   });
-  console.log(data);
 }
 
 </script>

@@ -73,7 +73,7 @@
 import { ref } from 'vue';
 import type { FormError } from '#ui/types';
 import type { UserSignUp } from '~~/types/types';
-import { AuthError, createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import GoogleIcon from '../../assets/icons/Google.vue';
 
 const supabase = createClient("https://jjewrcjhtqwapmssonfo.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZXdyY2podHF3YXBtc3NvbmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjIwNDUsImV4cCI6MjA0MzYzODA0NX0.zqk2RUxq6L74-n4b137mOm4LM85K-d8Z9_XzUFbW7i0");
@@ -100,20 +100,15 @@ const signUp = async(user: UserSignUp) => {
     },
   });
 
-  console.log(data);
-  console.log(error);
-
-  username.value='';
-  email.value='';
-  password.value='';
+  if(!error) {
+    window.location.pathname = '/';
+  }
 }
 
 const signUpWithGoogle = async() => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
   });
-
-  console.log(error);
 }
 
 </script>

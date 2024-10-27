@@ -1,6 +1,22 @@
 
 <script lang="ts" setup>
+import type { User } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
+const supabase = createClient("https://jjewrcjhtqwapmssonfo.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZXdyY2podHF3YXBtc3NvbmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjIwNDUsImV4cCI6MjA0MzYzODA0NX0.zqk2RUxq6L74-n4b137mOm4LM85K-d8Z9_XzUFbW7i0");
+const loggedUser = ref<User | null>();
+
+const getUser = async() => {
+  const { data: { user } } = await supabase.auth.getUser();
+  console.log(user?.user_metadata.full_name);
+  loggedUser.value = user;
+}
+
+const { data } = supabase.auth.onAuthStateChange(() => getUser() );
+
+onMounted(() => {
+  getUser();
+})
 </script>
 
 <template>
@@ -10,15 +26,25 @@
         <NuxtImg width="56px" densities="x1" format="webp" class="rounded-full" src="/Logo.jpg" alt="" />
         <span class="text-3xl font-bold">Danila Anikin</span>
       </NuxtLink>
-      <ul class="flex gap-6 ml-auto text-xl font-bold capitalize">
+      <ul class="flex gap-6 ml-auto text-xl font-bold capitalize items-center">
         <li>
           <NuxtLink to="/">Home</NuxtLink>
         </li>
         <li>
-          <NuxtLink to="/aboutMe">About Me</NuxtLink>
+          <NuxtLink :to="loggedUser ? '/signOut' : 'signIn'">{{`${ loggedUser ? 'Sign Out' : 'Sign In' }`}}</NuxtLink>
         </li>
-        <li>
-          <NuxtLink to="/signIn">Sign In</NuxtLink>
+        <li v-if="loggedUser">
+          <div class="flex items-center gap-4 border border-slate-400 rounded-3xl">
+            <p class="ml-4">{{ loggedUser?.user_metadata.full_name }}</p>
+            <NuxtImg
+              v-if="loggedUser?.user_metadata.avatar_url"
+              :src="loggedUser?.user_metadata.avatar_url"
+              format="webp"
+              width="48px"
+              class="rounded-3xl"
+            >
+            </NuxtImg>
+          </div>
         </li>
       </ul>
     </nav>
