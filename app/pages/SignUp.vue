@@ -1,7 +1,9 @@
 <template>
   <div class="flex justify-center items-center mt-[10%]">
     <div class="w-full max-w-md rounded-lg shadow-md p-8 border-slate-500 border">
-      <h2 class="text-2xl font-bold text-center mb-6">Sign Up</h2>
+      <h2 class="text-2xl font-bold text-center mb-2">Sign Up</h2>
+
+      <p class="w-full mb-4 text-center">Already have an account? <NuxtLink to="/signIn" class="text-green-600 text-lg"> Login</NuxtLink></p>
 
       <form @submit.prevent="signUp({username, email, password})">
         <div class="mb-6">

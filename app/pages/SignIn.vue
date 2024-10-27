@@ -41,17 +41,17 @@
         </div>
       </form>
 
-      <p class="w-full text-center">Don't have an account yet? <NuxtLink to="/signUp" class="text-green-600 text-lg"> Sign up</NuxtLink></p>
+      <p class="w-full text-center">Don't have an account yet? <NuxtLink to="/signUp" class="text-green-600 text-lg"> Sign Up</NuxtLink></p>
 
       <div class="text-center text-gray-500 my-6">or</div>
 
       <div>
         <NuxtLink
           @click="loginWithGoogle()"
-          class="w-full gap-4 border border-slate-400 transition-all duration-500 font-bold text-white py-4 px-4 rounded-md flex items-center justify-center hover:bg-indigo-700 hover:text-slate-200"
+          class="w-full gap-3 border border-slate-400 transition-all duration-500 font-bold text-white py-4 px-4 rounded-md flex items-center justify-center hover:bg-indigo-700 hover:text-slate-200"
         >
           <GoogleIcon color="#9189f5" />
-          Sign in with Google
+          Login with Google
         </NuxtLink>
       </div>
     </div>
