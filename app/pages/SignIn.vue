@@ -38,6 +38,9 @@
           >
             Login
           </button>
+          <div class="mt-3">
+            <div v-if="errorMsg?.length != 0" v-for="error in errorMsg" class="text-red-500">{{ error.message }}</div>
+          </div>
         </div>
       </form>
 
@@ -59,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import type { FormError } from '#ui/types';
 import type { UserLogin } from '~~/types/types';
 import { createClient } from '@supabase/supabase-js';
@@ -70,21 +72,32 @@ const supabase = createClient("https://jjewrcjhtqwapmssonfo.supabase.co", "eyJhb
 const email = ref('');
 const password = ref('');
 
-const login = async(user: UserLogin) => {
+const errorMsg = ref();
 
+const login = async(user: UserLogin) => {
+  errorMsg.value = [];
   const errors: FormError[] = []
   if (!user.email) errors.push({ path: 'email', message: 'Email is required' })
   if (!user.password) errors.push({ path: 'password', message: 'Password is required' })
   if (errors.length!=0) {
-    console.log(errors);
+    errorMsg.value = errors;
     return errors
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword(user);
-
-  if(!error) {
-    window.location.pathname = '/';
+  try{
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: user.password,
+    });
+    if (error) {
+      errorMsg.value.push(error);
+      throw error;
+    }
+  } catch (error: any) {
+    return;
   }
+
+  window.location.pathname = '/';
 }
 
 const loginWithGoogle = async() => {

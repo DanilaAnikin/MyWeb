@@ -23,5 +23,8 @@
     "vue": "latest",
     "vue-router": "latest",
     "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/supabase": "^1.4.1"
   }
 }

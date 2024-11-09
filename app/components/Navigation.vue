@@ -6,13 +6,23 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient("https://jjewrcjhtqwapmssonfo.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZXdyY2podHF3YXBtc3NvbmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjIwNDUsImV4cCI6MjA0MzYzODA0NX0.zqk2RUxq6L74-n4b137mOm4LM85K-d8Z9_XzUFbW7i0");
 const loggedUser = ref<User | null>();
 
+const userShowName = ref<string>('');
+
 const getUser = async() => {
   const { data: { user } } = await supabase.auth.getUser();
-  console.log(user?.user_metadata.full_name);
   loggedUser.value = user;
+  
+  userShowName.value = user?.user_metadata.full_name ? user.user_metadata.full_name : user?.user_metadata.name ? user.user_metadata.name : user?.user_metadata.email
 }
 
-const { data } = supabase.auth.onAuthStateChange(() => getUser() );
+const onChange = async() => {
+  const { data } = await supabase.auth.onAuthStateChange((event, session) => { 
+    if(event === "SIGNED_OUT" || event === "SIGNED_IN" || event === "USER_UPDATED") {
+      getUser();
+    }
+  });
+  data.subscription.unsubscribe();
+}
 
 onMounted(() => {
   getUser();
@@ -35,7 +45,7 @@ onMounted(() => {
         </li>
         <li v-if="loggedUser">
           <div class="flex items-center gap-4 border border-slate-400 rounded-3xl">
-            <p class="ml-4">{{ loggedUser?.user_metadata.full_name }}</p>
+            <p :class="`${ loggedUser.user_metadata.avatar_url ? 'ml-4' : 'mx-4 my-3' }`">{{ userShowName }}</p>
             <NuxtImg
               v-if="loggedUser?.user_metadata.avatar_url"
               :src="loggedUser?.user_metadata.avatar_url"

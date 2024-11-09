@@ -32,7 +32,7 @@
           />
         </div>
 
-        <div class="mb-8">
+        <div class="mb-6">
           <label for="password" class="block text-md font-medium text-gray-400">Password</label>
           <input
             v-model="password"
@@ -43,7 +43,11 @@
             required
             autocomplete="off"
           />
+          <div class="mt-3">
+            <div v-if="errorMsg.length != 0" v-for="error in errorMsg" class="text-red-500">{{ error.message }}</div>
+          </div>
         </div>
+
 
         <div class="mb-6">
           <button
@@ -76,7 +80,7 @@ import { ref } from 'vue';
 import type { FormError } from '#ui/types';
 import type { UserSignUp } from '~~/types/types';
 import { createClient } from '@supabase/supabase-js';
-import GoogleIcon from '../../assets/icons/Google.vue';
+import GoogleIcon from '../../assets/icons/Google.vue'; 
 
 const supabase = createClient("https://jjewrcjhtqwapmssonfo.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqZXdyY2podHF3YXBtc3NvbmZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwNjIwNDUsImV4cCI6MjA0MzYzODA0NX0.zqk2RUxq6L74-n4b137mOm4LM85K-d8Z9_XzUFbW7i0");
 
@@ -84,25 +88,36 @@ const username = ref<string>('');
 const email = ref<string>('');
 const password = ref<string>('');
 
+const errorMsg = ref<FormError[]>([]);
+
 const signUp = async(user: UserSignUp) => {
+  errorMsg.value = [];
   const errors: FormError[] = [];
   if (!user.email) errors.push({ path: 'email', message: 'Email is required' })
   if (!user.password) errors.push({ path: 'password', message: 'Password is required' })
   if (errors.length != 0) {
+    errorMsg.value = errors
     return errors
   }
   
-  const { data, error } = await supabase.auth.signUp({
-    email: user.email,
-    password: user.password,
-    options: {
-      data: {
-        username: user.username,
+  try{
+    const { data, error } = await supabase.auth.signUp({
+      email: user.email,
+      password: user.password,
+      options: {
+        data: {
+          name: user.username,
+        },
       },
-    },
-  });
+    });
+    if(error) throw error;
+  } catch (error: any) {
+    return;
+  }
 
-  if(!error) {
+  const { data, error } = await supabase.auth.signInWithPassword(user)
+
+  if (!error) {
     window.location.pathname = '/';
   }
 }
